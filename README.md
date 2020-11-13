@@ -1,6 +1,18 @@
 # AmazonLinux ECR Pipeline
 
-## Deploy
+## Deployment instructions
+
+#### Note: Create a Personal Access Token for your Github account for the AWS webhook.
+##### Link: https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token
+
+This application is deployed using AWS CloudFormation.
+
+#### CloudFormation Parameters: (required)
+* GitHubRepo
+* GitHubBranch
+* GitHubToken (do not commit this value)
+* GitHubUser
+* RepositoryName (ECR repository name to be created)
 
 * Local bash terminal
 * <a href="https://us-west-2.console.aws.amazon.com/cloud9/home?region=us-west-2">Cloud9</a> (Oregon)
@@ -8,9 +20,7 @@
 * <a href="https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1">CloudFormation</a> (N.Virginia)
 * <a href="https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1">CloudFormation</a> (N.Virginia)
 
-This application is deployed using AWS CloudFormation.
-
-Create ECR pipeline resources:
+Create ECR pipeline resources: (add parameters)
 ```
 aws cloudformation deploy --stack-name amazonlinux-ecr-pipeline --template-file cfn/ecr-pipeline-stack.yml --capabilities CAPABILITY_NAMED_IAM
 ```
