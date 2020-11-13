@@ -1,9 +1,17 @@
 # AmazonLinux ECR Pipeline
 
+This solution will create a working Docker image ECR pipeline which scans new images on each push. The following resources will be created:
+* ECR Repository with Docker image scanning enabled by default
+* CodeBuild Project
+* S3 Bucket for CodePipeline artifacts
+* IAM Roles for related services
+
 ## Deployment instructions
 
-#### Note: Create a Personal Access Token for your Github account for the AWS webhook.
-##### Link: https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token
+#### Note:
+  Create a Personal Access Token for your Github account for the AWS webhook.
+##### Link:
+  https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token
 
 This application is deployed using AWS CloudFormation.
 
