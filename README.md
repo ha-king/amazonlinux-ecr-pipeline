@@ -1,6 +1,6 @@
 # AmazonLinux ECR Pipeline
 
-This solution will create a working Docker image ECR pipeline which scans new images on each push. The following resources will be created:
+This solution will create a working Docker image ECR pipeline which pulls AmazonLinux base image from DockerHub, then pushes to ECR and scans new images on each push. The following resources will be created:
 * ECR Repository with Docker image scanning enabled by default
 * CodeBuild Project
 * S3 Bucket for CodePipeline artifacts
