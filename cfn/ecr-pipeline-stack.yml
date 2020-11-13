@@ -3,6 +3,18 @@ Description:
 
 Parameters:
 
+  GitHubRepo:
+    Type: String
+
+  GitHubBranch:
+    Type: String
+
+  GitHubToken:
+    Type: String
+
+  GitHubUser:
+    Type: String
+
   RepositoryName:
     Description: Amazon ECR repository name
     Type: String
@@ -10,7 +22,6 @@ Parameters:
 Resources:
   ECRRepository: 
     Type: AWS::ECR::Repository
-    DeletionPolicy: Retain
     Properties: 
       RepositoryName: !Sub ${RepositoryName}
       ImageScanningConfiguration: 
@@ -36,7 +47,6 @@ Resources:
 
   ArtifactBucket:
     Type: AWS::S3::Bucket
-    DeletionPolicy: Retain
 
   CodeBuildProject:
     Type: AWS::CodeBuild::Project
@@ -51,7 +61,7 @@ Resources:
             pre_build:
               commands:
                 - echo Logging in to Amazon ECR...
-                - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+                - $(aws ecr get-login --no-include-email --region us-east-1)
             build:
               commands:
                 - echo Build started on $(date)
@@ -70,12 +80,14 @@ Resources:
         EnvironmentVariables:
           - Name: AWS_DEFAULT_REGION
             Value: !Ref AWS::Region
+          - Name: AWS_ACCOUNT_ID
+            Value: !Ref AWS::AccountId
           - Name: REPOSITORY_URI
             Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${RepositoryName}
           - Name: IMAGE_TAG
             Value: latest
           - Name: IMAGE_REPO_NAME
-            Value: !Ref ${RepositoryName}
+            Value: !Ref RepositoryName
       Name: !Sub ${RepositoryName}-codebuildproject
       ServiceRole: !Ref CodeBuildServiceRole
 
@@ -87,6 +99,22 @@ Resources:
         Type: S3
         Location: !Ref ArtifactBucket
       Stages:
+        - Name: Source
+          Actions:
+            - Name: Dockerfile
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Version: 1
+                Provider: GitHub
+              Configuration:
+                Owner: !Ref GitHubUser
+                Repo: !Ref GitHubRepo
+                Branch: !Ref GitHubBranch
+                OAuthToken: !Ref GitHubToken
+              OutputArtifacts:
+                - Name: DockerImage
+              RunOrder: 1
         - Name: Build
           Actions:
             - Name: Build
@@ -98,7 +126,7 @@ Resources:
               Configuration:
                 ProjectName: !Ref CodeBuildProject
               InputArtifacts:
-                - Name: App
+                - Name: DockerImage
               OutputArtifacts:
                 - Name: BuildOutput
               RunOrder: 1
